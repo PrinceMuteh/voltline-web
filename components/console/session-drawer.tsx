@@ -37,8 +37,7 @@ function SessionPanel({ id, onClose }: { id: string; onClose: () => void }) {
   const { data: me } = useMe();
   const now = useNow(10_000);
   const timeZone = me?.workspace.timeZone;
-  const latestSoc =
-    s?.power.findLast((p) => p.socPct !== null)?.socPct ?? null;
+  const latestSoc = s?.power.findLast((p) => p.socPct !== null)?.socPct ?? null;
   const [stopping, setStopping] = useState(false);
   const stop = async () => {
     if (!s) return;
@@ -186,11 +185,16 @@ function SessionPanel({ id, onClose }: { id: string; onClose: () => void }) {
 
       {s && s.status === "ACTIVE" && me && me.role !== "FINANCE" && (
         <footer className="flex flex-wrap items-center gap-2 border-t border-line px-5 py-3">
-          <Button variant="secondary" loading={stopping} onClick={() => void stop()}>
+          <Button
+            variant="secondary"
+            loading={stopping}
+            onClick={() => void stop()}
+          >
             Stop session
           </Button>
           <p className="text-[12.5px] text-ink-3">
-            Asks the charger to end it now; the bill is final once the charger confirms.
+            Asks the charger to end it now; the bill is final once the charger
+            confirms.
           </p>
         </footer>
       )}

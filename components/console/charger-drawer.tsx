@@ -218,7 +218,10 @@ function RemoteActions({
       request: () =>
         api.POST("/v1/console/chargers/{id}/commands", {
           params: { path: { id: charger.id } },
-          body: { kind, evseId: kind === "remote-stop" ? running?.evseId : undefined },
+          body: {
+            kind,
+            evseId: kind === "remote-stop" ? running?.evseId : undefined,
+          },
         }),
     });
 
@@ -254,7 +257,9 @@ function RemoteActions({
         </Button>
         <Button
           variant="secondary"
-          onClick={() => void send(outOfService ? "set-available" : "set-unavailable")}
+          onClick={() =>
+            void send(outOfService ? "set-available" : "set-unavailable")
+          }
         >
           {outOfService ? "Make available" : "Make unavailable"}
         </Button>
@@ -268,7 +273,8 @@ function RemoteActions({
         {outOfService
           ? "Out of service: drivers can’t start sessions until you make it available."
           : "Make unavailable takes it out of service; a running session finishes first."}
-        {canHardReset && " A hard reset ends any running session. Hold for 2 seconds to confirm."}
+        {canHardReset &&
+          " A hard reset ends any running session. Hold for 2 seconds to confirm."}
       </p>
     </section>
   );

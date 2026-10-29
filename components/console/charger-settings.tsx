@@ -40,7 +40,10 @@ export function ChargerSettings({
   return (
     <section aria-labelledby="settings-heading" className="mt-6">
       <div className="flex items-center justify-between gap-2">
-        <h3 id="settings-heading" className="text-[13px] font-medium text-ink-3">
+        <h3
+          id="settings-heading"
+          className="text-[13px] font-medium text-ink-3"
+        >
           Charger settings
         </h3>
         <Button
@@ -114,7 +117,9 @@ function SettingRow({
     );
     setSaving(false);
     if (error || !data) {
-      toast.error(`${item.key} not changed`, { description: errorMessage(error) });
+      toast.error(`${item.key} not changed`, {
+        description: errorMessage(error),
+      });
       return;
     }
     if (data.status === "Accepted" || data.status === "RebootRequired") {
@@ -147,7 +152,9 @@ function SettingRow({
             <span className="font-mono text-ink-2 break-all">
               {item.value ?? item.note ?? "–"}
             </span>
-            {item.readonly && <span className="text-[11.5px] text-ink-3">read-only</span>}
+            {item.readonly && (
+              <span className="text-[11.5px] text-ink-3">read-only</span>
+            )}
             {canEdit && (
               <button
                 type="button"
@@ -169,7 +176,10 @@ function SettingRow({
             void save();
           }}
         >
-          <label className="sr-only" htmlFor={`setting-${item.component}-${item.key}`}>
+          <label
+            className="sr-only"
+            htmlFor={`setting-${item.component}-${item.key}`}
+          >
             New value for {item.key}
           </label>
           <input
@@ -177,9 +187,13 @@ function SettingRow({
             value={value}
             onChange={(e) => setValue(e.target.value)}
             autoFocus
-            className="h-8 min-w-0 flex-1 rounded-control border border-line-strong px-2 font-mono text-[13px] outline-none focus:border-ink-3"
+            className="h-8 min-w-0 flex-1 rounded-control border border-line-strong px-2 font-mono text-[16px] outline-none focus:border-ink-3 sm:text-[13px]"
           />
-          <Button type="submit" className="h-8 px-3 text-[13px]" loading={saving}>
+          <Button
+            type="submit"
+            className="h-8 px-3 text-[13px]"
+            loading={saving}
+          >
             Save
           </Button>
           <Button

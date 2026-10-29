@@ -324,6 +324,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/console/chargers/{id}/configuration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ChargersController_readConfiguration"];
+        put: operations["ChargersController_writeConfiguration"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/console/sessions/{id}/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ChargersController_stopSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/console/network": {
         parameters: {
             query?: never;
@@ -514,6 +546,7 @@ export interface components {
             reference: string;
             /** @example Adaeze O. */
             driver: string;
+            chargerId: string;
             /** @example CP-0021 */
             chargePointId: string;
             /** @example Airport Road Hub */
@@ -544,6 +577,8 @@ export interface components {
             /** Format: date-time */
             at: string;
             powerW: number;
+            /** @description Battery %, when the car reports it */
+            socPct: number | null;
         };
         TimelineEntryDto: {
             /** Format: date-time */
@@ -582,6 +617,7 @@ export interface components {
             reference: string;
             /** @example Adaeze O. */
             driver: string;
+            chargerId: string;
             /** @example CP-0021 */
             chargePointId: string;
             /** @example Airport Road Hub */
@@ -669,6 +705,15 @@ export interface components {
             model?: string;
             connectors: components["schemas"]["ConnectorInputDto"][];
         };
+        ActiveSessionDto: {
+            id: string;
+            /** @example S-10482 */
+            reference: string;
+            evseId: number;
+            /** Format: date-time */
+            startedAt: string;
+            energyWh: number;
+        };
         ConnectorDto: {
             connectorId: number;
             type: components["schemas"]["ConnectorType"];
@@ -710,6 +755,7 @@ export interface components {
             protocol: string | null;
             /** @description Has an open OCPP socket right now */
             connected: boolean;
+            activeSessions: components["schemas"]["ActiveSessionDto"][];
             firmwareVersion: string | null;
             /** @example 2 */
             securityProfile: number;
@@ -762,7 +808,7 @@ export interface components {
         };
         CommandDto: {
             /** @enum {string} */
-            kind: "remote-start" | "unlock" | "soft-reset" | "hard-reset";
+            kind: "remote-start" | "remote-stop" | "unlock" | "soft-reset" | "hard-reset" | "set-available" | "set-unavailable";
             /** @description Defaults to EVSE 1 */
             evseId?: number;
         };
@@ -775,6 +821,34 @@ export interface components {
             title: string;
             /** @example CP-0007 · UnlockConnector.conf Accepted */
             detail: string;
+        };
+        ConfigItemDto: {
+            /**
+             * @description OCPP 2.0.1 component; null for 1.6J
+             * @example OCPPCommCtrlr
+             */
+            component: string | null;
+            /** @example HeartbeatInterval */
+            key: string;
+            /** @example 300 */
+            value: string | null;
+            readonly: boolean;
+            /** @example UnknownVariable */
+            note: string | null;
+        };
+        ConfigWriteDto: {
+            component?: string | null;
+            /** @example HeartbeatInterval */
+            key: string;
+            /** @example 300 */
+            value: string;
+        };
+        ConfigWriteResultDto: {
+            /**
+             * @description Accepted, Rejected, RebootRequired, NotSupported…
+             * @example Accepted
+             */
+            status: string;
         };
         NetworkDto: {
             /** @description Approved chargers with an open socket */
@@ -1439,6 +1513,73 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    ChargersController_readConfiguration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfigItemDto"][];
+                };
+            };
+        };
+    };
+    ChargersController_writeConfiguration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfigWriteDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfigWriteResultDto"];
+                };
+            };
+        };
+    };
+    ChargersController_stopSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommandResultDto"];
+                };
             };
         };
     };
