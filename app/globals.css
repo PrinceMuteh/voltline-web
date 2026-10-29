@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+/*
+ * Flex Mobility design system tokens (04-design-system/design-system.md).
+ * Flat, quiet, quick: no gradients, no shimmer, one accent per business.
+ */
+@theme {
+  /* Interface colour */
+  --color-ink: #0b0b0c;
+  --color-ink-2: #3f3f46;
+  --color-ink-3: #62626b;
+  --color-line-strong: #d4d4cf;
+  --color-line: #e8e8e4;
+  --color-subtle: #f7f7f5;
+  --color-volt: #22c55e;
+  --color-volt-ink: #15803d;
+  --color-charging: #1d4ed8;
+  --color-warning: #b93c0a;
+  --color-error: #b42318;
+
+  /* Marketing (Flex Mobility site only) */
+  --color-navy: #02025c;
+  --color-navy-hover: #0d0d74;
+  --color-navy-tint: #eeeef8;
+  --color-navy-ink: #0e0e2c;
+  --color-navy-body: #45465a;
+  --color-navy-muted: #5b5d72;
+  --color-paper: #f6f6f9;
+  --color-navy-line: #e3e4ec;
+
+  /* Type */
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-instrument-sans), var(--font-geist), sans-serif;
+
+  /* Shape */
+  --radius-control: 9px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --animate-pulse-quiet: pulse-quiet 1.6s ease-in-out infinite;
+  --animate-spin-linear: spin 600ms linear infinite;
+  --animate-blur-in: blur-in 200ms var(--ease-out);
+  --animate-slide-in: slide-in 200ms var(--ease-out);
+  --animate-step-forward: step-forward 240ms var(--ease-out);
+  --animate-step-back: step-back 240ms var(--ease-out);
+
+  @keyframes slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+
+  /* Add a charger: steps enter from the right going forward, from the left going back */
+  @keyframes step-forward {
+    from {
+      opacity: 0;
+      transform: translateX(24px);
+      filter: blur(2px);
+    }
+  }
+
+  @keyframes step-back {
+    from {
+      opacity: 0;
+      transform: translateX(-24px);
+      filter: blur(2px);
+    }
+  }
+
+  @keyframes blur-in {
+    from {
+      opacity: 0;
+      filter: blur(2px);
+    }
+  }
+
+  @keyframes pulse-quiet {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.45;
+    }
+  }
+}
+
+@layer base {
+  html {
+    color: var(--color-ink);
+    background: #ffffff;
+  }
+
+  body {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Mobile inputs stay at 16 px so iOS never zooms */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  @media (min-width: 768px) {
+    input,
+    select,
+    textarea {
+      font-size: 15px;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-charging);
+    outline-offset: 2px;
+  }
+}
+
+/* IDs, kW and ₦ amounts */
+@utility tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Large figures (stat tiles) stay in the sans face, with figures that don't jump */
+@utility nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Reduced motion: movement becomes short fades */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 120ms !important;
+    transition-property:
+      opacity, color, background-color, border-color !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

@@ -1,0 +1,3 @@
+# Copied byte-for-byte from voltline-api (npm run sync:pricing there)
+lib/pricing.ts
+lib/api/schema.d.ts
