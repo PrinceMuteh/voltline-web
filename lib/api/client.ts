@@ -38,10 +38,20 @@ function refreshSession(): Promise<boolean> {
 async function fetchWithRefresh(request: Request): Promise<Response> {
   const retry = request.clone();
   const response = await fetch(request);
-  if (
-    response.status !== 401 ||
-    new URL(request.url).pathname.startsWith("/api/v1/auth/")
-  ) {
+  const path = new URL(request.url).pathname;
+  if (response.status !== 401 || path.startsWith("/api/v1/auth/")) {
+    return response;
+  }
+  // The driver app has its own long-lived sign-in and no refresh: back to its welcome screen
+  if (path.startsWith("/api/v1/app/")) {
+    if (
+      !path.startsWith("/api/v1/app/auth/") &&
+      window.location.pathname.startsWith("/app") &&
+      !window.location.pathname.startsWith("/app/welcome")
+    ) {
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign("/app/welcome");
+    }
     return response;
   }
   if (await refreshSession()) {

@@ -159,7 +159,7 @@ export function StatusMap({
         ref={el}
         role="region"
         aria-label="Map of sites and charger status"
-        className="h-80 w-full overflow-hidden rounded-xl border border-line bg-subtle"
+        className="isolate h-80 w-full overflow-hidden rounded-xl border border-line bg-subtle"
       />
       <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12.5px] text-ink-2">
         {(["charging", "available", "faulted", "offline"] as const).map((s) => (

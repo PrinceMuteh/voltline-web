@@ -596,6 +596,198 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/app/auth/otp/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DriverAuthController_send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/app/auth/otp/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DriverAuthController_verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/app/auth/sign-out": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DriverAuthController_signOut"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/app/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DriverController_me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["DriverController_update"];
+        trace?: never;
+    };
+    "/v1/app/me/cards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DriverController_linkCard"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/app/stations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DriverController_stations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/app/stations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DriverController_station"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/app/chargers/by-code/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DriverController_byCode"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/app/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DriverController_history"];
+        put?: never;
+        post: operations["DriverController_start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/app/sessions/live": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DriverController_live"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/app/sessions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DriverController_receipt"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/app/sessions/{id}/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DriverController_stop"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1273,6 +1465,158 @@ export interface components {
             revenueTodayKobo: number;
             /** @description Wh delivered per local hour today, 24 entries; null for hours still to come */
             energyByHourWh: (number | null)[];
+        };
+        SendCodeDto: {
+            /** @example 803 000 0000 */
+            phone: string;
+        };
+        SentCodeDto: {
+            /** @example +2348030000000 */
+            phone: string;
+            /** @description Only outside production, while no SMS provider is set up */
+            devCode?: string;
+        };
+        VerifyCodeDto: {
+            /** @example 803 000 0000 */
+            phone: string;
+            /** @example 123456 */
+            code: string;
+        };
+        VerifiedDto: {
+            /** @description First sign-in: show plug and location set-up */
+            isNew: boolean;
+        };
+        DriverMeDto: {
+            id: string;
+            name: string | null;
+            /** @example +2348030000000 */
+            phone: string;
+            plugTypes: components["schemas"]["ConnectorType"][];
+            /** @example 1500000 */
+            autoStopKobo: number | null;
+            /** @description Null: no wallet yet */
+            walletKobo: number | null;
+            /**
+             * @example [
+             *       "04:A2:1C:9F"
+             *     ]
+             */
+            cards: string[];
+            /** @example Voltline Demo */
+            operator: string;
+        };
+        UpdateDriverDto: {
+            name?: string | null;
+            plugTypes?: components["schemas"]["ConnectorType"][];
+            /** @description Kobo; null for no limit */
+            autoStopKobo?: number | null;
+        };
+        LinkCardDto: {
+            /**
+             * @description Printed on the card
+             * @example 04:A2:1C:9F
+             */
+            uid: string;
+        };
+        StationPriceDto: {
+            /** @example Standard DC */
+            name: string;
+            /** @example 30000 */
+            perKwhKobo: number;
+            sessionFeeKobo: number;
+            idleGraceMin: number | null;
+            idlePerMinuteKobo: number | null;
+            peakFrom: string | null;
+            peakTo: string | null;
+            peakSurchargeBps: number | null;
+        };
+        StationConnectorDto: {
+            chargerId: string;
+            /** @example CP-0021 */
+            chargePointId: string;
+            evseId: number;
+            type: components["schemas"]["ConnectorType"];
+            /** @example 120 */
+            maxKw: number;
+            /** @enum {string} */
+            status: "AVAILABLE" | "RESERVED" | "CHARGING" | "FAULTED" | "UNAVAILABLE" | "OFFLINE";
+        };
+        StationDto: {
+            id: string;
+            /** @example Airport Road Hub */
+            name: string;
+            area: string | null;
+            address: string | null;
+            latitude: number | null;
+            longitude: number | null;
+            /** @example Open 24 hours */
+            openingHours: string;
+            /** @example 120 */
+            maxKw: number;
+            /** @description Connectors free right now */
+            free: number;
+            /** @description Every charger here is offline */
+            offline: boolean;
+            /** @description Minutes since the site was last heard from, when offline */
+            offlineMinutes: number | null;
+            price: components["schemas"]["StationPriceDto"] | null;
+            connectors: components["schemas"]["StationConnectorDto"][];
+        };
+        StartDto: {
+            chargerId: string;
+            evseId: number;
+        };
+        StartResultDto: {
+            /** @enum {string} */
+            outcome: "ACCEPTED" | "REJECTED" | "NO_RESPONSE" | "OFFLINE";
+            title: string;
+            message: string;
+        };
+        LiveSessionDto: {
+            id: string;
+            /** @example S-10482 */
+            reference: string;
+            status: components["schemas"]["SessionStatus"];
+            stationName: string;
+            chargePointId: string;
+            evseId: number;
+            connectorType: components["schemas"]["ConnectorType"] | null;
+            /** Format: date-time */
+            startedAt: string;
+            /** Format: date-time */
+            endedAt: string | null;
+            energyWh: number;
+            powerW: number | null;
+            socPct: number | null;
+            /** @description So far while active; final once ended */
+            costKobo: number;
+            autoStopKobo: number | null;
+            /** @description The car has stopped drawing power (idle time may be billed) */
+            idle: boolean;
+        };
+        LiveDto: {
+            /** @description Null when nothing is running */
+            session: components["schemas"]["LiveSessionDto"] | null;
+        };
+        HistoryItemDto: {
+            id: string;
+            reference: string;
+            stationName: string;
+            connectorType: components["schemas"]["ConnectorType"] | null;
+            /** Format: date-time */
+            startedAt: string;
+            /** Format: date-time */
+            endedAt: string | null;
+            energyWh: number;
+            amountKobo: number;
+            status: components["schemas"]["SessionStatus"];
+        };
+        HistoryDto: {
+            /** @example October */
+            month: string;
+            monthEnergyWh: number;
+            monthAmountKobo: number;
+            sessions: components["schemas"]["HistoryItemDto"][];
         };
     };
     responses: never;
@@ -2197,6 +2541,296 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["OverviewDto"];
                 };
+            };
+        };
+    };
+    DriverAuthController_send: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendCodeDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SentCodeDto"];
+                };
+            };
+        };
+    };
+    DriverAuthController_verify: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyCodeDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerifiedDto"];
+                };
+            };
+        };
+    };
+    DriverAuthController_signOut: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DriverController_me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DriverMeDto"];
+                };
+            };
+        };
+    };
+    DriverController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateDriverDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DriverMeDto"];
+                };
+            };
+        };
+    };
+    DriverController_linkCard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LinkCardDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DriverMeDto"];
+                };
+            };
+        };
+    };
+    DriverController_stations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StationDto"][];
+                };
+            };
+        };
+    };
+    DriverController_station: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StationDto"];
+                };
+            };
+        };
+    };
+    DriverController_byCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StationDto"];
+                };
+            };
+        };
+    };
+    DriverController_history: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HistoryDto"];
+                };
+            };
+        };
+    };
+    DriverController_start: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StartResultDto"];
+                };
+            };
+        };
+    };
+    DriverController_live: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LiveDto"];
+                };
+            };
+        };
+    };
+    DriverController_receipt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionDetailDto"];
+                };
+            };
+        };
+    };
+    DriverController_stop: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
