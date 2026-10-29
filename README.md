@@ -60,6 +60,19 @@ app/globals.css              design tokens from the Flex Mobility design system
 
 Open http://localhost:3000/app (or 3001 if 3000 is taken) and sign in with any Nigerian mobile number. No SMS provider is wired yet, so outside production the 6-digit code is shown on screen. Drivers have their own `vl_driver` cookie; console and driver sign-ins never open each other's pages. Payments are not taken yet: sessions are priced and billed to the driver's account, and the wallet shows its balance without top-ups.
 
+## Demo without a backend (Vercel)
+
+With `NEXT_PUBLIC_DEMO_MODE=true` the app needs no API. It answers its own `/api` calls in the browser from `lib/demo/snapshot.json`, a snapshot of a real voltline-api with the demo fleet running; dates are shifted so "today" stays today. A banner says it is a demo.
+
+- Console: sign in as `admin@voltline.local` / `voltline-demo-123` (also `bola@`, `grace@`, `support@` for the other roles). Creating accounts is turned off.
+- Driver app: any Nigerian mobile number; the code is `123456`.
+- Commands, reservations, settings, tariff and site edits respond realistically but reset on reload. Charging sessions started in the driver app are kept in the browser's localStorage, so the console in another tab lists them.
+- Not live: no OCPP, no live socket (screens refresh every 5 s instead), no payments.
+
+To deploy: import this repository in Vercel, add the environment variable `NEXT_PUBLIC_DEMO_MODE` = `true`, and deploy. No other settings are needed.
+
+To refresh the sample data, run the API and `npm run sim:fleet`, then `npm run demo:snapshot` here.
+
 ## Design rules worth keeping
 
 - Colours, fonts and motion curves come from the tokens in `app/globals.css`; don't hard-code new ones.

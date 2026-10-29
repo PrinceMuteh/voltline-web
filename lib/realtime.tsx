@@ -3,7 +3,7 @@
 import { useQueryClient, type QueryKey } from "@tanstack/react-query";
 import { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { api, type Schemas } from "./api/client";
+import { api, DEMO, type Schemas } from "./api/client";
 import { keys } from "./api/queries";
 
 type Message = Schemas["OcppMessageDto"];
@@ -24,6 +24,8 @@ export function RealtimeBridge({ children }: { children: React.ReactNode }) {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
+    // The demo has no server to hold a socket; screens poll or update from their own calls
+    if (DEMO) return;
     const url = process.env.NEXT_PUBLIC_REALTIME_URL ?? "http://localhost:4000";
     const socket = io(`${url}/console`, {
       transports: ["websocket"],

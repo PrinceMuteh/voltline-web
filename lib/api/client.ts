@@ -22,11 +22,42 @@ export function errorMessage(
   return fallback;
 }
 
+/** Backend-free demo: the app answers its own API calls from sample data (lib/demo). */
+export const DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+
+/** The network, or in the demo the in-browser API (loaded only then). */
+async function send(request: Request): Promise<Response> {
+  if (DEMO) {
+    const { demoFetch } = await import("../demo/demo-api");
+    return demoFetch(request);
+  }
+  return fetch(request);
+}
+
+/** Downloads a file from the API (e.g. the sessions CSV) under the given name. */
+export async function download(path: string, filename: string) {
+  const response = await send(
+    new Request(new URL(`/api${path}`, window.location.href)),
+  );
+  if (!response.ok) throw new Error("Download failed");
+  const url = URL.createObjectURL(await response.blob());
+  const link = Object.assign(document.createElement("a"), {
+    href: url,
+    download: filename,
+  });
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 let refreshing: Promise<boolean> | null = null;
 
 /** One refresh at a time, shared by every request that hit a 401 meanwhile. */
 function refreshSession(): Promise<boolean> {
-  refreshing ??= fetch("/api/v1/auth/refresh", { method: "POST" })
+  refreshing ??= send(
+    new Request(new URL("/api/v1/auth/refresh", window.location.href), {
+      method: "POST",
+    }),
+  )
     .then((res) => res.ok)
     .catch(() => false)
     .finally(() => {
@@ -37,7 +68,7 @@ function refreshSession(): Promise<boolean> {
 
 async function fetchWithRefresh(request: Request): Promise<Response> {
   const retry = request.clone();
-  const response = await fetch(request);
+  const response = await send(request);
   const path = new URL(request.url).pathname;
   if (response.status !== 401 || path.startsWith("/api/v1/auth/")) {
     return response;
@@ -55,7 +86,7 @@ async function fetchWithRefresh(request: Request): Promise<Response> {
     return response;
   }
   if (await refreshSession()) {
-    return fetch(retry);
+    return send(retry);
   }
   if (window.location.pathname.startsWith("/console")) {
     const next = encodeURIComponent(window.location.pathname);

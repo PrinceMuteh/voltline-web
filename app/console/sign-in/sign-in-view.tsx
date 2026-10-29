@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Field, validateEmail } from "@/components/ui/field";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { StatusPill } from "@/components/ui/status-pill";
-import { api, errorMessage, type Schemas } from "@/lib/api/client";
+import { api, errorMessage, type Schemas, DEMO } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 
 type Mode = "sign-in" | "create";
@@ -101,6 +101,13 @@ function SignInForm() {
           Welcome back
         </h1>
         <p className="text-ink-3">Sign in to your operator workspace.</p>
+        {DEMO && (
+          <p className="mt-3 rounded-lg border border-dashed border-line-strong px-3 py-2 text-[13.5px] text-ink-2">
+            Demo sign-in:{" "}
+            <span className="font-mono">admin@voltline.local</span> /{" "}
+            <span className="font-mono">voltline-demo-123</span>
+          </p>
+        )}
       </header>
 
       <Field

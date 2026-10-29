@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "gen:api": "openapi-typescript http://localhost:4000/openapi.json -o lib/api/schema.d.ts",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "demo:snapshot": "node scripts/demo-snapshot.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.105.0",

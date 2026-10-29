@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "@/components/ui/menu";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Skeleton } from "@/components/ui/skeleton";
-import { errorMessage } from "@/lib/api/client";
+import { download, errorMessage } from "@/lib/api/client";
+import { toast } from "sonner";
 import { useMe, useSessions, type SessionsQuery } from "@/lib/api/queries";
 import { dayTime, duration, kwh, naira } from "@/lib/format";
 import { useNow } from "@/lib/use-now";
@@ -47,7 +48,7 @@ export function SessionsView() {
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   };
 
-  const csv = `/api/v1/console/sessions/export.csv?${new URLSearchParams(
+  const csv = `/v1/console/sessions/export.csv?${new URLSearchParams(
     query as Record<string, string>,
   )}`;
 
@@ -64,13 +65,17 @@ export function SessionsView() {
               options={ranges}
               onChange={setRange}
             />
-            <a
-              href={csv}
-              download
+            <button
+              type="button"
+              onClick={() =>
+                void download(csv, "voltline-sessions.csv").catch(() =>
+                  toast.error("The CSV could not be downloaded. Try again."),
+                )
+              }
               className="inline-flex h-9 items-center rounded-control bg-ink px-4 text-[14px] font-medium text-white transition-transform duration-160 ease-out active:scale-[0.97]"
             >
               Export CSV
-            </a>
+            </button>
           </>
         }
       />
