@@ -41,6 +41,8 @@ export const keys = {
   sessions: ["console", "sessions"] as const,
   session: (id: string) => ["console", "session", id] as const,
   tariffs: ["console", "tariffs"] as const,
+  drivers: ["console", "drivers"] as const,
+  idTokens: ["console", "id-tokens"] as const,
 };
 
 export type SessionsQuery = NonNullable<
@@ -188,7 +190,7 @@ export function useTariffs() {
 
 export function useIdTokens() {
   return useQuery({
-    queryKey: ["console", "id-tokens"],
+    queryKey: keys.idTokens,
     queryFn: async () => {
       const { data, error } = await api.GET("/v1/console/id-tokens");
       if (error) throw error;
@@ -206,5 +208,19 @@ export function useOcppSettings() {
       if (error) throw error;
       return data;
     },
+  });
+}
+
+export function useDrivers(q: string) {
+  return useQuery({
+    queryKey: [...keys.drivers, q],
+    queryFn: async () => {
+      const { data, error } = await api.GET("/v1/console/drivers", {
+        params: { query: q ? { q } : {} },
+      });
+      if (error) throw error;
+      return data;
+    },
+    placeholderData: (previous) => previous,
   });
 }

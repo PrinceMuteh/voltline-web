@@ -401,6 +401,94 @@ route("POST", "/console/chargers/:id/local-list/sync", ({ params }) => {
   });
 });
 
+// ─── Console: drivers and RFID cards ────────────────────────────────────────
+
+const driversPage = () => db.console.drivers;
+route("GET", "/console/drivers", ({ query }) => {
+  const q = (query.get("q") ?? "").trim().toLowerCase();
+  const digits = q.replace(/\D/g, "").replace(/^0/, "");
+  const hex = q.replace(/[\s:]/g, "");
+  const page = driversPage();
+  const drivers = q
+    ? page.drivers.filter(
+        (d: any) =>
+          d.name?.toLowerCase().includes(q) ||
+          d.fleet?.toLowerCase().includes(q) ||
+          // Phones are masked (+234 815 ••• 6630): match the parts that show
+          (digits.length >= 3 &&
+            d.phone
+              ?.replace(/\D/g, "")
+              .startsWith(`234${digits.slice(0, 3)}`) &&
+            (digits.length < 7 ||
+              d.phone.replace(/\D/g, "").endsWith(digits.slice(-4)))) ||
+          d.cards.some((uid: string) =>
+            uid.replace(/:/g, "").toLowerCase().includes(hex),
+          ),
+      )
+    : page.drivers;
+  return json({ ...page, drivers });
+});
+const setDriverStatus = (id: string, status: string) => {
+  const d = driversPage().drivers.find((x: any) => x.id === id);
+  if (!d) return fail(404, "Driver not found.");
+  d.status = status;
+  return json({ driver: d, syncing: rows().filter((r) => r.connected).length });
+};
+route("POST", "/console/drivers/:id/block", ({ params }) =>
+  setDriverStatus(params[0], "BLOCKED"),
+);
+route("POST", "/console/drivers/:id/unblock", ({ params }) =>
+  setDriverStatus(params[0], "ACTIVE"),
+);
+route("POST", "/console/id-tokens", ({ body }) => {
+  const hex = String(body.uid)
+    .replace(/[\s:-]/g, "")
+    .toUpperCase();
+  if (!/^([0-9A-F]{2}){4,10}$/.test(hex))
+    return fail(400, "Card UIDs are 4 to 10 hex bytes, like 04:A2:1C:9F.");
+  const uid = hex.match(/.{2}/g)!.join(":");
+  const page = driversPage();
+  const taken = db.console.idTokens.find((t: any) => t.uid === uid);
+  if (taken)
+    return fail(
+      409,
+      `${uid} is already issued${taken.holder ? ` to ${taken.holder}` : ""}.`,
+    );
+  const holder = page.drivers.find((d: any) => d.id === body.driverId);
+  const fleet = page.fleets.find(
+    (f: any) => f.id === (body.fleetId ?? null) || f.name === holder?.fleet,
+  );
+  holder?.cards.push(uid);
+  if (fleet) fleet.cards += 1;
+  page.cardsIssued += 1;
+  const name = holder?.name ?? fleet?.name ?? null;
+  const card = { id: uuid(), uid, holder: name };
+  db.console.idTokens.push(card);
+  return json(
+    { ...card, syncing: rows().filter((r) => r.connected).length },
+    201,
+  );
+});
+route("POST", "/console/fleets", ({ body }) => {
+  const fleet = {
+    id: uuid(),
+    name: String(body.name).trim(),
+    cards: 0,
+    monthKobo: 0,
+    invoiceDay: body.invoiceDay ?? 1,
+  };
+  driversPage().fleets.push(fleet);
+  return json(fleet, 201);
+});
+// No card reader in the demo: a card "taps" a couple of seconds later
+route("POST", "/console/chargers/:id/read-card", async () => {
+  await new Promise((r) => setTimeout(r, 2200));
+  const uid = Array.from(crypto.getRandomValues(new Uint8Array(4)), (b, i) =>
+    (i === 0 ? 4 : b).toString(16).padStart(2, "0").toUpperCase(),
+  ).join(":");
+  return json({ uid, known: false });
+});
+
 const password = () =>
   Array.from(
     crypto.getRandomValues(new Uint8Array(24)),
@@ -549,13 +637,17 @@ const COMPLETED = ["COMPLETED", "REFUNDED"];
 
 route("GET", "/console/sessions", ({ query }) => {
   const start = rangeStart(query.get("range") ?? "7d");
-  const q = (query.get("q") ?? "").toLowerCase();
+  const q = (query.get("q") ?? "").trim().toLowerCase();
+  // Rows show "Tunde B."; Drivers › View sessions searches "Tunde Bakare"
+  const [first, last] = q.split(/\s+/);
+  const short = last ? `${first} ${last[0]}.` : null;
   const inRange = allRows().filter((r) => Date.parse(r.startedAt) >= start);
   const searched = inRange.filter(
     (r) =>
       !q ||
-      [r.reference, r.driver, r.chargePointId].some((v: string) =>
-        v.toLowerCase().includes(q),
+      [r.reference, r.driver, r.chargePointId].some(
+        (v: string) =>
+          v.toLowerCase().includes(q) || (short && v.toLowerCase() === short),
       ),
   );
   const status = query.get("status") ?? "all";

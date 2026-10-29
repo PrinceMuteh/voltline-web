@@ -44,6 +44,7 @@ for (const [key, path] of Object.entries({
   ocppSettings: "/console/ocpp-settings",
   nextId: "/console/chargers/next-id",
   sessions: "/console/sessions?range=30d",
+  drivers: "/console/drivers",
 })) {
   c[key] = await get("console", path);
 }

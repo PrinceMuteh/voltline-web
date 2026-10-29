@@ -413,7 +413,7 @@ export interface paths {
         };
         get: operations["ChargersController_idTokens"];
         put?: never;
-        post?: never;
+        post: operations["DriversController_issueCard"];
         delete?: never;
         options?: never;
         head?: never;
@@ -782,6 +782,86 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["DriverController_stop"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/console/drivers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DriversController_page"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/console/drivers/{id}/block": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DriversController_block"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/console/drivers/{id}/unblock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DriversController_unblock"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/console/fleets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DriversController_createFleet"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/console/chargers/{id}/read-card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DriversController_readCard"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1618,6 +1698,86 @@ export interface components {
             monthAmountKobo: number;
             sessions: components["schemas"]["HistoryItemDto"][];
         };
+        FleetSummaryDto: {
+            id: string;
+            /** @example GreenRide fleet */
+            name: string;
+            /** @description Active cards held by the fleet */
+            cards: number;
+            /** @description Billed this month, in kobo */
+            monthKobo: number;
+            /** @description Day of the month the fleet is invoiced */
+            invoiceDay: number;
+        };
+        DriverRowDto: {
+            id: string;
+            /** @example Adaeze Okafor */
+            name: string | null;
+            /**
+             * @description Masked; null for fleet vehicles
+             * @example +234 803 ••• 4412
+             */
+            phone: string | null;
+            /** @example GreenRide fleet */
+            fleet: string | null;
+            /** @description Signed in to the driver app */
+            app: boolean;
+            /**
+             * @example [
+             *       "04:A2:1C:9F"
+             *     ]
+             */
+            cards: string[];
+            sessions: number;
+            /** @enum {string} */
+            billing: "WALLET" | "PREPAID" | "INVOICE";
+            /** @example 1850000 */
+            walletKobo: number | null;
+            /** @enum {string} */
+            status: "ACTIVE" | "BLOCKED" | "PAYMENT_OVERDUE";
+        };
+        DriversPageDto: {
+            /** @description Drivers with a session this month */
+            activeThisMonth: number;
+            /** @description Active RFID cards */
+            cardsIssued: number;
+            fleets: components["schemas"]["FleetSummaryDto"][];
+            drivers: components["schemas"]["DriverRowDto"][];
+        };
+        DriverStatusResultDto: {
+            driver: components["schemas"]["DriverRowDto"];
+            /** @description Connected chargers being sent the new list */
+            syncing: number;
+        };
+        IssueCardDto: {
+            /** @example 04:E3:5A:71 */
+            uid: string;
+            driverId?: string | null;
+            fleetId?: string | null;
+            /** @example 2000000 */
+            dailyLimitKobo?: number | null;
+        };
+        IssuedCardDto: {
+            id: string;
+            /** @example 04:E3:5A:71 */
+            uid: string;
+            /** @example Adaeze Okafor */
+            holder: string | null;
+            /** @description Connected chargers being sent the new list */
+            syncing: number;
+        };
+        FleetInputDto: {
+            /** @example GreenRide fleet */
+            name: string;
+            /** @example 1 */
+            invoiceDay?: number;
+        };
+        ReadCardResultDto: {
+            /** @example 04:E3:5A:71 */
+            uid: string;
+            /** @description Already issued in this workspace */
+            known: boolean;
+        };
     };
     responses: never;
     parameters: never;
@@ -2248,6 +2408,29 @@ export interface operations {
             };
         };
     };
+    DriversController_issueCard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IssueCardDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssuedCardDto"];
+                };
+            };
+        };
+    };
     ChargersController_stopSession: {
         parameters: {
             query?: never;
@@ -2831,6 +3014,114 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    DriversController_page: {
+        parameters: {
+            query?: {
+                /** @description Name, phone or card UID */
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DriversPageDto"];
+                };
+            };
+        };
+    };
+    DriversController_block: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DriverStatusResultDto"];
+                };
+            };
+        };
+    };
+    DriversController_unblock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DriverStatusResultDto"];
+                };
+            };
+        };
+    };
+    DriversController_createFleet: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FleetInputDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FleetSummaryDto"];
+                };
+            };
+        };
+    };
+    DriversController_readCard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadCardResultDto"];
+                };
             };
         };
     };

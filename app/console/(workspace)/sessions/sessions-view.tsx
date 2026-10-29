@@ -27,17 +27,20 @@ const ranges: { value: Range; label: string }[] = [
 
 export function SessionsView() {
   const { data: me } = useMe();
-  const [range, setRange] = useState<Range>("7d");
+  // The drawer lives in the URL (?session=<id>) so a session can be linked to;
+  // ?q= opens it searched over 30 days, as from Drivers › View sessions
+  const searchParams = useSearchParams();
+  const [range, setRange] = useState<Range>(() =>
+    searchParams.get("q") ? "30d" : "7d",
+  );
   const [filter, setFilter] = useState<Filter>("all");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => searchParams.get("q") ?? "");
   const q = useDeferredValue(search.trim());
   const query: SessionsQuery = { range, status: filter, ...(q ? { q } : {}) };
   const { data, error, isPlaceholderData } = useSessions(query);
   const now = useNow(30_000);
   const timeZone = me?.workspace.timeZone ?? "Africa/Lagos";
 
-  // The drawer lives in the URL (?session=<id>) so a session can be linked to
-  const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
   const openSession = (id: string | null) => {
