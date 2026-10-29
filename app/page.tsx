@@ -20,6 +20,12 @@ export default function Home() {
           className="inline-flex h-9 items-center rounded-control bg-ink px-4 text-[14px] font-medium text-white"
         >
           Sign in to the console
+        </Link>{" "}
+        <Link
+          href="/app"
+          className="ml-2 inline-flex h-9 items-center rounded-control border border-line-strong px-4 text-[14px] font-medium"
+        >
+          Open the driver app
         </Link>
       </div>
     </main>

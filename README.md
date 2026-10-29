@@ -1,6 +1,6 @@
 # voltline-web
 
-Every screen of the Voltline Charging Platform (Flex Mobility Limited): marketing site, operator console and driver app.
+Every screen of the Voltline Charging Platform (Flex Mobility Limited): marketing site, operator console (`/console`) and driver app (`/app`).
 
 Next.js 16 (App Router, Cache Components) · Tailwind CSS 4 · TanStack Query · typed client generated from the API's OpenAPI spec. The backend lives in [`../voltline-api`](../voltline-api).
 
@@ -41,6 +41,11 @@ app/
   console/(workspace)/       console shell (sidebar) + Overview (tiles, energy chart, chargers, drawer),
                              Add a charger wizard (chargers/new), Alerts, Sessions (drawer, CSV), Tariffs
   console/receipts/[id]      printable session receipt (print or save as PDF)
+  console/(workspace)/chargers/[id]/log   searchable OCPP log for one charger
+  console/(workspace)/settings            Sites and OCPP settings
+  app/                       the driver app (phone-width): welcome/ onboarding, (tabs)/ map,
+                             sessions, wallet, account; charging/ live session; receipt/[id];
+                             scan/ QR or charger ID. /app/c/{chargePointId} is a charger's QR link.
   legal/                     Terms of Use, Privacy Policy (placeholders)
 components/ui/               Button, StatusPill, SegmentedControl, HoldToConfirm, Drawer, Skeleton, Field, Spinner
 components/console/          PageHeader, ChargerDrawer, phase placeholders
@@ -50,6 +55,10 @@ lib/pricing.ts               copy of voltline-api's pricing function, for the in
                              Don't edit it here: change src/billing/pricing.ts there and run npm run sync:pricing
 app/globals.css              design tokens from the Flex Mobility design system
 ```
+
+## Driver app
+
+Open http://localhost:3000/app (or 3001 if 3000 is taken) and sign in with any Nigerian mobile number. No SMS provider is wired yet, so outside production the 6-digit code is shown on screen. Drivers have their own `vl_driver` cookie; console and driver sign-ins never open each other's pages. Payments are not taken yet: sessions are priced and billed to the driver's account, and the wallet shows its balance without top-ups.
 
 ## Design rules worth keeping
 
