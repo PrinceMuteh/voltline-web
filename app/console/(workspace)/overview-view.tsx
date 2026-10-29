@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { ChargerDrawer } from "@/components/console/charger-drawer";
 import { PageHeader } from "@/components/console/page-header";
+import { StatusMap } from "@/components/console/status-map";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { errorMessage } from "@/lib/api/client";
@@ -14,6 +15,7 @@ import {
   useMe,
   useOnboarding,
   useOverview,
+  useSites,
 } from "@/lib/api/queries";
 import { cn } from "@/lib/cn";
 import { ChargersTable } from "./chargers-table";
@@ -32,6 +34,7 @@ export function OverviewView() {
   const { data: overview, error: overviewError } = useOverview();
   const { data: chargers } = useChargers();
   const { data: alerts } = useAlerts();
+  const { data: sites } = useSites();
   const [query, setQuery] = useState("");
 
   // The drawer lives in the URL (?charger=<id>) so alerts and links can open it
@@ -136,6 +139,13 @@ export function OverviewView() {
           <NeedsAttention alerts={alerts} onInspect={openCharger} limit={3} />
         </section>
       </div>
+
+      <section aria-labelledby="map-heading" className="mt-8">
+        <h2 id="map-heading" className="mb-3 text-[16px] font-semibold">
+          Network map
+        </h2>
+        <StatusMap sites={sites} chargers={chargers} onOpen={openCharger} />
+      </section>
 
       <ChargersTable
         rows={chargers}

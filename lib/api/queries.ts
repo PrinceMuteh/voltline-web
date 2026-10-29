@@ -35,6 +35,7 @@ export const keys = {
   charger: (id: string) => ["console", "charger", id] as const,
   messages: (id: string) => ["console", "charger", id, "messages"] as const,
   check: (id: string) => ["console", "charger", id, "check"] as const,
+  log: (id: string) => ["console", "charger", id, "log"] as const,
   alerts: ["console", "alerts"] as const,
   sites: ["console", "sites"] as const,
   sessions: ["console", "sessions"] as const,

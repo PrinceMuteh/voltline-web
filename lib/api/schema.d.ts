@@ -276,6 +276,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/console/chargers/{id}/messages/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ChargersController_searchMessages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/console/chargers/{id}/messages": {
         parameters: {
             query?: never;
@@ -805,6 +821,16 @@ export interface components {
             action: string;
             /** @example Power.Active.Import 7.2 kW */
             summary: string;
+            payload: {
+                [key: string]: unknown;
+            };
+        };
+        MessagePageDto: {
+            messages: components["schemas"]["OcppMessageDto"][];
+            /** Format: date-time */
+            nextBefore: string | null;
+            /** @description Actions seen on this charger (first page only) */
+            actions: string[];
         };
         CommandDto: {
             /** @enum {string} */
@@ -863,6 +889,11 @@ export interface components {
             name: string;
             /** @example Wuse II, Abuja */
             area: string | null;
+            address: string | null;
+            /** @example 9.0765 */
+            latitude: number | null;
+            /** @example 7.4886 */
+            longitude: number | null;
         };
         NamedDto: {
             id: string;
@@ -1446,6 +1477,34 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ConnectCheckDto"];
+                };
+            };
+        };
+    };
+    ChargersController_searchMessages: {
+        parameters: {
+            query?: {
+                /** @description Text in the action or the raw payload */
+                q?: string;
+                action?: string;
+                direction?: "INBOUND" | "OUTBOUND";
+                /** @description Older than this (the previous page’s nextBefore) */
+                before?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessagePageDto"];
                 };
             };
         };

@@ -80,7 +80,7 @@ export function RealtimeBridge({ children }: { children: React.ReactNode }) {
           list ? [message, ...list].slice(0, 50) : list,
         );
         // Any message is a sign of life: keep "Last message" current
-        refetch(keys.chargers);
+        refetch(keys.chargers, keys.log(chargerId));
       },
     );
     socket.on(

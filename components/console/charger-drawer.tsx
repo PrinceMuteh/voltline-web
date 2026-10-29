@@ -156,9 +156,20 @@ function ChargerPanel({ id, onClose }: { id: string; onClose: () => void }) {
             )}
 
             <section ref={logRef} aria-labelledby="ocpp-log" className="mt-6">
-              <h3 id="ocpp-log" className="text-[13px] font-medium text-ink-3">
-                OCPP messages (live)
-              </h3>
+              <div className="flex items-baseline justify-between gap-2">
+                <h3
+                  id="ocpp-log"
+                  className="text-[13px] font-medium text-ink-3"
+                >
+                  OCPP messages (live)
+                </h3>
+                <Link
+                  href={`/console/chargers/${charger.id}/log`}
+                  className="text-[13px] font-medium text-ink-2 underline underline-offset-2 hover:text-ink"
+                >
+                  Search full log
+                </Link>
+              </div>
               <MessageLog id={charger.id} timeZone={me?.workspace.timeZone} />
             </section>
           </>
