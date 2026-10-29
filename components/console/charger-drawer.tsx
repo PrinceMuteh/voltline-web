@@ -8,6 +8,7 @@ import { HoldToConfirm } from "@/components/ui/hold-to-confirm";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusPill, chargerStatus } from "@/components/ui/status-pill";
 import { api, errorMessage, type Schemas } from "@/lib/api/client";
+import { ChargerAccess } from "./charger-access";
 import { ChargerSettings } from "./charger-settings";
 import { runCommand } from "./run-command";
 import { useCharger, useChargerMessages, useMe } from "@/lib/api/queries";
@@ -144,6 +145,13 @@ function ChargerPanel({ id, onClose }: { id: string; onClose: () => void }) {
               <RemoteActions
                 charger={charger}
                 canHardReset={me.role !== "SUPPORT"}
+              />
+            )}
+
+            {charger.approval === "ACCEPTED" && me && me.role !== "FINANCE" && (
+              <ChargerAccess
+                charger={charger}
+                canSync={me.role === "ADMIN" || me.role === "OPERATOR"}
               />
             )}
 

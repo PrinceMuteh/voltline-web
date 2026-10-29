@@ -16,6 +16,7 @@ const URGENCY: Status[] = [
   "unavailable",
   "pending",
   "charging",
+  "reserved",
   "available",
 ];
 const COLOR: Record<Status, string> = {
@@ -24,6 +25,7 @@ const COLOR: Record<Status, string> = {
   unavailable: "#62626b",
   pending: "#62626b",
   charging: "#1d4ed8",
+  reserved: "#15803d",
   available: "#22c55e",
   "payment-failed": "#b42318",
 };
@@ -33,6 +35,7 @@ const LABEL: Record<Status, string> = {
   unavailable: "Unavailable",
   pending: "Pending approval",
   charging: "Charging",
+  reserved: "Reserved",
   available: "Available",
   "payment-failed": "Payment failed",
 };

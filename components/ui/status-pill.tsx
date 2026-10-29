@@ -3,6 +3,7 @@ import { cn } from "@/lib/cn";
 export type Status =
   | "charging"
   | "available"
+  | "reserved"
   | "faulted"
   | "offline"
   | "unavailable"
@@ -24,6 +25,12 @@ const styles: Record<
     dot: "bg-volt",
     text: "text-volt-ink",
     bg: "bg-[#edf9f1]",
+  },
+  reserved: {
+    label: "Reserved",
+    dot: "bg-volt-ink",
+    text: "text-volt-ink",
+    bg: "bg-subtle",
   },
   faulted: {
     label: "Faulted",

@@ -356,6 +356,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/console/chargers/{id}/reservations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ChargersController_reserve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/console/chargers/{id}/reservations/{reservationId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ChargersController_cancelReservation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/console/chargers/{id}/local-list/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ChargersController_syncLocalList"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/console/id-tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ChargersController_idTokens"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/console/sessions/{id}/stop": {
         parameters: {
             query?: never;
@@ -395,13 +459,45 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["ChargersController_sites"];
+        get: operations["SitesController_list"];
+        put?: never;
+        post: operations["SitesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/console/sites/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["SitesController_update"];
+        trace?: never;
+    };
+    "/v1/console/ocpp-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SettingsController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["SettingsController_update"];
         trace?: never;
     };
     "/v1/console/tariffs": {
@@ -665,7 +761,7 @@ export interface components {
             registeredCompanyName: string | null;
         };
         /** @enum {string} */
-        ChargerStatus: "AVAILABLE" | "CHARGING" | "FAULTED" | "OFFLINE" | "UNAVAILABLE";
+        ChargerStatus: "AVAILABLE" | "RESERVED" | "CHARGING" | "FAULTED" | "OFFLINE" | "UNAVAILABLE";
         /** @enum {string} */
         ApprovalState: "PENDING" | "ACCEPTED" | "REJECTED";
         ChargerRowDto: {
@@ -730,6 +826,18 @@ export interface components {
             startedAt: string;
             energyWh: number;
         };
+        ReservationDto: {
+            id: string;
+            evseId: number;
+            /** @example 04:A2:1C:9F */
+            idTag: string;
+            driver: string | null;
+            /** Format: date-time */
+            expiresAt: string;
+            /** @enum {string} */
+            status: "REQUESTED" | "ACTIVE" | "USED" | "CANCELLED" | "EXPIRED" | "REJECTED";
+            rejection: string | null;
+        };
         ConnectorDto: {
             connectorId: number;
             type: components["schemas"]["ConnectorType"];
@@ -772,6 +880,11 @@ export interface components {
             /** @description Has an open OCPP socket right now */
             connected: boolean;
             activeSessions: components["schemas"]["ActiveSessionDto"][];
+            reservations: components["schemas"]["ReservationDto"][];
+            /** @description RFID list version last sent (0 = never) */
+            localListVersion: number;
+            /** Format: date-time */
+            localListSyncedAt: string | null;
             firmwareVersion: string | null;
             /** @example 2 */
             securityProfile: number;
@@ -876,6 +989,34 @@ export interface components {
              */
             status: string;
         };
+        ReserveDto: {
+            /** @default 1 */
+            evseId: number;
+            /** @description The RFID card the connector is held for */
+            idTokenId: string;
+            /** @example 30 */
+            minutes: number;
+        };
+        ReserveResultDto: {
+            /** @enum {string} */
+            status: "ACTIVE" | "REJECTED";
+            title: string;
+            detail: string;
+        };
+        LocalListResultDto: {
+            /** @example Accepted */
+            status: string;
+            version: number;
+            /** @description Cards in the list */
+            entries: number;
+        };
+        IdTokenDto: {
+            id: string;
+            /** @example 04:A2:1C:9F */
+            uid: string;
+            /** @example Tunde Bakare */
+            holder: string | null;
+        };
         NetworkDto: {
             /** @description Approved chargers with an open socket */
             socketsConnected: number;
@@ -894,6 +1035,62 @@ export interface components {
             latitude: number | null;
             /** @example 7.4886 */
             longitude: number | null;
+            /** @example Open 24 hours */
+            openingHours: string;
+            /** @example 250 */
+            gridLimitKw: number | null;
+            chargerCount: number;
+        };
+        SiteInputDto: {
+            /** @example Ikeja City Mall */
+            name: string;
+            /** @example Ikeja, Lagos */
+            area?: string | null;
+            address?: string | null;
+            latitude?: number | null;
+            longitude?: number | null;
+            /** @example Open 24 hours */
+            openingHours?: string;
+            /** @example 250 */
+            gridLimitKw?: number | null;
+        };
+        SiteUpdateDto: {
+            /** @example Ikeja City Mall */
+            name?: string;
+            /** @example Ikeja, Lagos */
+            area?: string | null;
+            address?: string | null;
+            latitude?: number | null;
+            longitude?: number | null;
+            /** @example Open 24 hours */
+            openingHours?: string;
+            /** @example 250 */
+            gridLimitKw?: number | null;
+        };
+        OcppSettingsDto: {
+            accept16J: boolean;
+            accept201: boolean;
+            /** @description Not supported by the gateway yet; always false */
+            accept21: boolean;
+            autoApproveChargers: boolean;
+            syncLocalLists: boolean;
+            /** @example 300 */
+            heartbeatIntervalSec: number;
+            /** @example 60 */
+            meterValuesSampleSec: number;
+            /** @example 10 */
+            offlineAlertAfterMin: number;
+            /** @example ws://localhost:4000/ocpp/{chargePointId} */
+            endpoint: string;
+        };
+        OcppSettingsUpdateDto: {
+            accept16J?: boolean;
+            accept201?: boolean;
+            autoApproveChargers?: boolean;
+            syncLocalLists?: boolean;
+            heartbeatIntervalSec?: number;
+            meterValuesSampleSec?: number;
+            offlineAlertAfterMin?: number;
         };
         NamedDto: {
             id: string;
@@ -1059,6 +1256,7 @@ export interface components {
             online: number;
             charging: number;
             available: number;
+            reserved: number;
             faulted: number;
             offline: number;
             unavailable: number;
@@ -1621,6 +1819,91 @@ export interface operations {
             };
         };
     };
+    ChargersController_reserve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReserveDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReserveResultDto"];
+                };
+            };
+        };
+    };
+    ChargersController_cancelReservation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                reservationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ChargersController_syncLocalList: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocalListResultDto"];
+                };
+            };
+        };
+    };
+    ChargersController_idTokens: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdTokenDto"][];
+                };
+            };
+        };
+    };
     ChargersController_stopSession: {
         parameters: {
             query?: never;
@@ -1661,7 +1944,7 @@ export interface operations {
             };
         };
     };
-    ChargersController_sites: {
+    SitesController_list: {
         parameters: {
             query?: never;
             header?: never;
@@ -1676,6 +1959,96 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SiteDto"][];
+                };
+            };
+        };
+    };
+    SitesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SiteInputDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteDto"];
+                };
+            };
+        };
+    };
+    SitesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SiteUpdateDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteDto"];
+                };
+            };
+        };
+    };
+    SettingsController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OcppSettingsDto"];
+                };
+            };
+        };
+    };
+    SettingsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OcppSettingsUpdateDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OcppSettingsDto"];
                 };
             };
         };

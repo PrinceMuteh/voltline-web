@@ -88,6 +88,7 @@ function Tile({
 function StatusBar({ counts }: { counts: Overview["chargers"] }) {
   const segments = [
     { n: counts.charging, color: "bg-charging", label: "charging" },
+    { n: counts.reserved, color: "bg-volt-ink", label: "reserved" },
     { n: counts.available, color: "bg-volt", label: "available" },
     { n: counts.faulted, color: "bg-warning", label: "faulted" },
     {

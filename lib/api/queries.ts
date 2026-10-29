@@ -185,3 +185,26 @@ export function useTariffs() {
     },
   });
 }
+
+export function useIdTokens() {
+  return useQuery({
+    queryKey: ["console", "id-tokens"],
+    queryFn: async () => {
+      const { data, error } = await api.GET("/v1/console/id-tokens");
+      if (error) throw error;
+      return data;
+    },
+    staleTime: 60_000,
+  });
+}
+
+export function useOcppSettings() {
+  return useQuery({
+    queryKey: ["console", "ocpp-settings"],
+    queryFn: async () => {
+      const { data, error } = await api.GET("/v1/console/ocpp-settings");
+      if (error) throw error;
+      return data;
+    },
+  });
+}
